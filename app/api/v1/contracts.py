@@ -4,7 +4,7 @@ Contract Analysis API Endpoints
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from typing import Optional
 
-from app.core.security import get_api_key, get_optional_api_key
+from app.core.security import get_api_key
 from app.models.contract import (
     ContractAnalyzeRequest,
     ContractAnalysis,
