@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: termscan-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: AI_PROVIDER
+        value: groq
+      - key: AI_MODEL
+        value: llama-3.3-70b-versatile
+      - key: DEBUG
+        value: "false"
+      - key: APP_ENV
+        value: production
+      - key: GROQ_API_KEY
+        sync: false

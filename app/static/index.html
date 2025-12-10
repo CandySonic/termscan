@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TermScan - AI Contract Compliance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #00d4aa, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: #fff;
+            font-size: 0.95rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+        
+        textarea::placeholder {
+            color: #64748b;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #00d4aa, #00b894);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 170, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Results */
+        .results {
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+        
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--score-color), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        
+        .score-number {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        
+        .score-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .score-bars {
+            margin-top: 1.5rem;
+        }
+        
+        .score-bar {
+            margin-bottom: 1rem;
+        }
+        
+        .score-bar-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.85rem;
+        }
+        
+        .score-bar-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Flags */
+        .flags-section {
+            margin-top: 2rem;
+        }
+        
+        .flag {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .flag.critical {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .flag.warning {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .flag.info {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .flag-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .flag-severity {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .flag.critical .flag-severity {
+            background: #ef4444;
+            color: #fff;
+        }
+        
+        .flag.warning .flag-severity {
+            background: #f59e0b;
+            color: #000;
+        }
+        
+        .flag-category {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        
+        .flag-clause {
+            font-style: italic;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .flag-explanation {
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .flag-suggestion {
+            color: #00d4aa;
+            font-size: 0.85rem;
+        }
+        
+        .flag-reference {
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Summary */
+        .summary {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary p {
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00d4aa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Positive aspects */
+        .positives {
+            margin-top: 1.5rem;
+        }
+        
+        .positive-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #00d4aa;
+            font-size: 0.9rem;
+        }
+        
+        .positive-item::before {
+            content: '✓';
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 TermScan</h1>
+            <p class="subtitle">AI-powered contract compliance analysis</p>
+        </header>
+        
+        <div class="main-grid">
+            <div class="card">
+                <h2>📄 Paste Your Contract</h2>
+                <textarea id="contractText" placeholder="Paste your contract text here...
+
+Example: Employment agreements, service contracts, lease agreements, partnership contracts, etc.
+
+The AI will analyze it for:
+• Riba (interest/usury)
+• Gharar (excessive uncertainty)
+• Maysir (gambling elements)
+• Haram industries
+• Unfair terms
+• Deceptive clauses"></textarea>
+                <button class="btn" id="analyzeBtn" onclick="analyzeContract()">
+                    Analyze Contract
+                </button>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Analysis Results</h2>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing contract for Islamic compliance...</p>
+                </div>
+                
+                <div class="results" id="results">
+                    <div class="score-circle" id="scoreCircle">
+                        <span class="score-number" id="overallScore">--</span>
+                        <span class="score-label">Overall Score</span>
+                    </div>
+                    
+                    <div class="summary" id="summary">
+                        <p id="summaryText"></p>
+                    </div>
+                    
+                    <div class="score-bars" id="scoreBars"></div>
+                    
+                    <div class="positives" id="positives"></div>
+                    
+                    <div class="flags-section" id="flags"></div>
+                </div>
+                
+                <div id="placeholder" style="text-align: center; color: #64748b; padding: 3rem;">
+                    <p>Paste a contract and click "Analyze" to see results</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function analyzeContract() {
+            const text = document.getElementById('contractText').value.trim();
+            
+            if (text.length < 50) {
+                alert('Please enter at least 50 characters of contract text.');
+                return;
+            }
+            
+            const btn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const placeholder = document.getElementById('placeholder');
+            
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            loading.classList.add('show');
+            results.classList.remove('show');
+            placeholder.style.display = 'none';
+            
+            try {
+                const response = await fetch('/v1/contracts/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        type: 'general'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Analysis failed');
+                }
+                
+                displayResults(data);
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Analyze Contract';
+                loading.classList.remove('show');
+            }
+        }
+        
+        function displayResults(data) {
+            const results = document.getElementById('results');
+            results.classList.add('show');
+            
+            // Overall score
+            const score = data.scores.overall;
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreNumber = document.getElementById('overallScore');
+            
+            let color;
+            if (score >= 80) color = '#00d4aa';
+            else if (score >= 60) color = '#f59e0b';
+            else color = '#ef4444';
+            
+            scoreCircle.style.setProperty('--score-color', color);
+            scoreNumber.style.color = color;
+            scoreNumber.textContent = score;
+            
+            // Summary
+            document.getElementById('summaryText').textContent = data.summary;
+            
+            // Score bars
+            const scoreBars = document.getElementById('scoreBars');
+            const scoreTypes = [
+                { key: 'riba_free', label: 'Riba-Free (No Interest)' },
+                { key: 'gharar_free', label: 'Gharar-Free (Clarity)' },
+                { key: 'halal_industry', label: 'Halal Industry' },
+                { key: 'fair_terms', label: 'Fair Terms' },
+                { key: 'transparency', label: 'Transparency' }
+            ];
+            
+            scoreBars.innerHTML = scoreTypes.map(({ key, label }) => {
+                const value = data.scores[key];
+                let barColor;
+                if (value >= 80) barColor = '#00d4aa';
+                else if (value >= 60) barColor = '#f59e0b';
+                else barColor = '#ef4444';
+                
+                return `
+                    <div class="score-bar">
+                        <div class="score-bar-header">
+                            <span>${label}</span>
+                            <span>${value}/100</span>
+                        </div>
+                        <div class="score-bar-track">
+                            <div class="score-bar-fill" style="width: ${value}%; background: ${barColor}"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Positive aspects
+            const positives = document.getElementById('positives');
+            if (data.positive_aspects && data.positive_aspects.length > 0) {
+                positives.innerHTML = '<h3 style="margin-bottom: 0.5rem; color: #00d4aa;">✓ Positive Aspects</h3>' +
+                    data.positive_aspects.map(p => `<div class="positive-item">${p}</div>`).join('');
+            } else {
+                positives.innerHTML = '';
+            }
+            
+            // Flags
+            const flags = document.getElementById('flags');
+            if (data.flags && data.flags.length > 0) {
+                flags.innerHTML = '<h3 style="margin-bottom: 1rem; color: #ef4444;">⚠️ Issues Found</h3>' +
+                    data.flags.map(flag => `
+                        <div class="flag ${flag.severity}">
+                            <div class="flag-header">
+                                <span class="flag-severity">${flag.severity}</span>
+                                <span class="flag-category">${flag.category.replace('_', ' ')}</span>
+                            </div>
+                            <div class="flag-clause">"${flag.clause}"</div>
+                            <div class="flag-explanation">${flag.explanation}</div>
+                            <div class="flag-suggestion">💡 ${flag.suggestion}</div>
+                            ${flag.reference ? `<div class="flag-reference">📚 ${flag.reference}</div>` : ''}
+                        </div>
+                    `).join('');
+            } else {
+                flags.innerHTML = '<p style="color: #00d4aa; text-align: center;">✓ No major issues found!</p>';
+            }
+        }
+    </script>
+</body>
+</html>
