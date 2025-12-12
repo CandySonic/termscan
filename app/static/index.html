@@ -19,14 +19,14 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
         
         header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
         
         h1 {
@@ -34,6 +34,7 @@
             margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #00d4aa, #7c3aed);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
@@ -69,7 +70,7 @@
         
         textarea {
             width: 100%;
-            height: 300px;
+            height: 200px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
@@ -87,6 +88,103 @@
         
         textarea::placeholder {
             color: #64748b;
+        }
+        
+        /* Checkbox Section */
+        .checks-section {
+            margin-top: 1.5rem;
+        }
+        
+        .checks-section h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: #e2e8f0;
+        }
+        
+        .checks-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        @media (max-width: 500px) {
+            .checks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .check-item:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .check-item.selected {
+            background: rgba(0, 212, 170, 0.15);
+            border-color: rgba(0, 212, 170, 0.4);
+        }
+        
+        .check-item input[type="checkbox"] {
+            display: none;
+        }
+        
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #64748b;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        
+        .check-item.selected .check-box {
+            background: #00d4aa;
+            border-color: #00d4aa;
+        }
+        
+        .check-box::after {
+            content: '✓';
+            color: #000;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .check-item.selected .check-box::after {
+            opacity: 1;
+        }
+        
+        .check-label {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .check-label .name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .check-label .desc {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        
+        .check-icon {
+            font-size: 1.2rem;
         }
         
         .btn {
@@ -342,15 +440,63 @@
                 <h2>📄 Paste Your Contract</h2>
                 <textarea id="contractText" placeholder="Paste your contract text here...
 
-Example: Employment agreements, service contracts, lease agreements, partnership contracts, etc.
-
-The AI will analyze it for:
-• Riba (interest/usury)
-• Gharar (excessive uncertainty)
-• Maysir (gambling elements)
-• Haram industries
-• Unfair terms
-• Deceptive clauses"></textarea>
+Example: Employment agreements, record deals, service contracts, lease agreements, partnership contracts, etc."></textarea>
+                
+                <div class="checks-section">
+                    <h3>🔍 What should we check for?</h3>
+                    <div class="checks-grid">
+                        <label class="check-item selected" data-check="islamic">
+                            <input type="checkbox" name="checks" value="islamic" checked>
+                            <span class="check-box"></span>
+                            <span class="check-icon">🕌</span>
+                            <span class="check-label">
+                                <span class="name">Islamic Compliance</span>
+                                <span class="desc">Riba, Gharar, Haram industries</span>
+                            </span>
+                        </label>
+                        
+                        <label class="check-item" data-check="artist_rights">
+                            <input type="checkbox" name="checks" value="artist_rights">
+                            <span class="check-box"></span>
+                            <span class="check-icon">🎵</span>
+                            <span class="check-label">
+                                <span class="name">Artist Rights</span>
+                                <span class="desc">Royalties, ownership, creative control</span>
+                            </span>
+                        </label>
+                        
+                        <label class="check-item" data-check="privacy">
+                            <input type="checkbox" name="checks" value="privacy">
+                            <span class="check-box"></span>
+                            <span class="check-icon">🔒</span>
+                            <span class="check-label">
+                                <span class="name">Privacy & Data</span>
+                                <span class="desc">GDPR, data collection, sharing</span>
+                            </span>
+                        </label>
+                        
+                        <label class="check-item" data-check="legal">
+                            <input type="checkbox" name="checks" value="legal">
+                            <span class="check-box"></span>
+                            <span class="check-icon">⚖️</span>
+                            <span class="check-label">
+                                <span class="name">Legal Red Flags</span>
+                                <span class="desc">Non-competes, liability, jurisdiction</span>
+                            </span>
+                        </label>
+                        
+                        <label class="check-item" data-check="fair_terms">
+                            <input type="checkbox" name="checks" value="fair_terms">
+                            <span class="check-box"></span>
+                            <span class="check-icon">⚡</span>
+                            <span class="check-label">
+                                <span class="name">Fair Terms</span>
+                                <span class="desc">Hidden fees, auto-renewal, one-sided</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
                 <button class="btn" id="analyzeBtn" onclick="analyzeContract()">
                     Analyze Contract
                 </button>
@@ -389,11 +535,38 @@ The AI will analyze it for:
     </div>
     
     <script>
+        // Toggle checkbox selection
+        document.querySelectorAll('.check-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.tagName === 'INPUT') return;
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('selected', checkbox.checked);
+            });
+            
+            // Sync initial state
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', function() {
+                item.classList.toggle('selected', this.checked);
+            });
+        });
+        
+        function getSelectedChecks() {
+            const checkboxes = document.querySelectorAll('input[name="checks"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+        
         async function analyzeContract() {
             const text = document.getElementById('contractText').value.trim();
+            const checks = getSelectedChecks();
             
             if (text.length < 50) {
                 alert('Please enter at least 50 characters of contract text.');
+                return;
+            }
+            
+            if (checks.length === 0) {
+                alert('Please select at least one check category.');
                 return;
             }
             
@@ -403,7 +576,7 @@ The AI will analyze it for:
             const placeholder = document.getElementById('placeholder');
             
             btn.disabled = true;
-            btn.textContent = 'Analyzing...';
+            btn.textContent = `Analyzing ${checks.length} ${checks.length === 1 ? 'category' : 'categories'}...`;
             loading.classList.add('show');
             results.classList.remove('show');
             placeholder.style.display = 'none';
@@ -416,7 +589,8 @@ The AI will analyze it for:
                     },
                     body: JSON.stringify({
                         text: text,
-                        type: 'general'
+                        type: 'general',
+                        checks: checks
                     })
                 });
                 
@@ -455,38 +629,69 @@ The AI will analyze it for:
             scoreNumber.style.color = color;
             scoreNumber.textContent = score;
             
-            // Summary
-            document.getElementById('summaryText').textContent = data.summary;
+            // Summary (handle markdown bold)
+            const summaryText = data.summary.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            document.getElementById('summaryText').innerHTML = summaryText;
             
-            // Score bars
+            // Score bars - use new category-based scores
             const scoreBars = document.getElementById('scoreBars');
-            const scoreTypes = [
-                { key: 'riba_free', label: 'Riba-Free (No Interest)' },
-                { key: 'gharar_free', label: 'Gharar-Free (Clarity)' },
-                { key: 'halal_industry', label: 'Halal Industry' },
-                { key: 'fair_terms', label: 'Fair Terms' },
-                { key: 'transparency', label: 'Transparency' }
-            ];
+            const categories = data.scores.categories || [];
             
-            scoreBars.innerHTML = scoreTypes.map(({ key, label }) => {
-                const value = data.scores[key];
+            const categoryLabels = {
+                'islamic': { icon: '🕌', name: 'Islamic Compliance' },
+                'artist_rights': { icon: '🎵', name: 'Artist Rights' },
+                'privacy': { icon: '🔒', name: 'Privacy & Data' },
+                'legal': { icon: '⚖️', name: 'Legal Safety' },
+                'fair_terms': { icon: '⚡', name: 'Fair Terms' }
+            };
+            
+            let barsHTML = '';
+            
+            categories.forEach(cat => {
+                const catInfo = categoryLabels[cat.category] || { icon: '📋', name: cat.category };
+                const value = cat.overall;
                 let barColor;
                 if (value >= 80) barColor = '#00d4aa';
                 else if (value >= 60) barColor = '#f59e0b';
                 else barColor = '#ef4444';
                 
-                return `
-                    <div class="score-bar">
+                barsHTML += `
+                    <div class="score-bar category-score">
                         <div class="score-bar-header">
-                            <span>${label}</span>
-                            <span>${value}/100</span>
+                            <span>${catInfo.icon} ${catInfo.name}</span>
+                            <span style="color: ${barColor}; font-weight: 600;">${value}/100</span>
                         </div>
                         <div class="score-bar-track">
                             <div class="score-bar-fill" style="width: ${value}%; background: ${barColor}"></div>
                         </div>
                     </div>
                 `;
-            }).join('');
+                
+                // Show breakdown for each category
+                if (cat.breakdown) {
+                    Object.entries(cat.breakdown).forEach(([key, val]) => {
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        let subColor;
+                        if (val >= 80) subColor = '#00d4aa';
+                        else if (val >= 60) subColor = '#f59e0b';
+                        else subColor = '#ef4444';
+                        
+                        barsHTML += `
+                            <div class="score-bar sub-score">
+                                <div class="score-bar-header">
+                                    <span style="padding-left: 1rem; font-size: 0.85rem; color: #94a3b8;">└ ${label}</span>
+                                    <span style="font-size: 0.85rem;">${val}/100</span>
+                                </div>
+                                <div class="score-bar-track" style="height: 6px;">
+                                    <div class="score-bar-fill" style="width: ${val}%; background: ${subColor}"></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            });
+            
+            scoreBars.innerHTML = barsHTML;
             
             // Positive aspects
             const positives = document.getElementById('positives');

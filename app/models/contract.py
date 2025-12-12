@@ -28,14 +28,46 @@ class FlagSeverity(str, Enum):
     INFO = "info"
 
 
+class CheckCategory(str, Enum):
+    """Categories of checks users can select"""
+    ISLAMIC = "islamic"           # Islamic/Halal compliance
+    ARTIST_RIGHTS = "artist_rights"  # Creator/artist protections
+    PRIVACY = "privacy"           # Privacy & data protection
+    LEGAL = "legal"               # Legal red flags
+    FAIR_TERMS = "fair_terms"     # Fair/balanced terms
+
+
 class FlagCategory(str, Enum):
-    """Categories of Islamic compliance issues"""
+    """Categories of flagged issues (expanded)"""
+    # Islamic categories
     RIBA = "riba"
     GHARAR = "gharar"
     MAYSIR = "maysir"
     HARAM_INDUSTRY = "haram_industry"
     DHULM = "dhulm"
     TADLIS = "tadlis"
+    # Artist rights categories
+    OWNERSHIP = "ownership"
+    ROYALTIES = "royalties"
+    TERMINATION = "termination"
+    EXCLUSIVITY = "exclusivity"
+    CREATIVE_CONTROL = "creative_control"
+    # Privacy categories
+    DATA_COLLECTION = "data_collection"
+    DATA_SHARING = "data_sharing"
+    CONSENT = "consent"
+    RETENTION = "retention"
+    # Legal categories
+    NON_COMPETE = "non_compete"
+    LIABILITY = "liability"
+    INDEMNIFICATION = "indemnification"
+    JURISDICTION = "jurisdiction"
+    # Fair terms categories
+    HIDDEN_FEES = "hidden_fees"
+    AUTO_RENEWAL = "auto_renewal"
+    ONE_SIDED = "one_sided"
+    PENALTY_CLAUSES = "penalty_clauses"
+    # General
     OTHER = "other"
 
 
@@ -46,13 +78,18 @@ class ContractAnalyzeRequest(BaseModel):
     text: str = Field(..., min_length=50, max_length=100000, description="Contract text to analyze")
     type: ContractType = Field(default=ContractType.GENERAL, description="Type of contract")
     language: str = Field(default="en", description="Language of the contract (ISO 639-1)")
+    checks: List[CheckCategory] = Field(
+        default=[CheckCategory.ISLAMIC],
+        description="Categories of checks to perform"
+    )
     
     class Config:
         json_schema_extra = {
             "example": {
                 "text": "This Employment Agreement is entered into between Company X and Employee Y...",
                 "type": "employment",
-                "language": "en"
+                "language": "en",
+                "checks": ["islamic", "artist_rights", "fair_terms"]
             }
         }
 
@@ -75,14 +112,24 @@ class ContractFlag(BaseModel):
     reference: Optional[str] = Field(None, description="Scholarly reference")
 
 
+class CategoryScores(BaseModel):
+    """Scores for a specific check category"""
+    category: CheckCategory
+    overall: int = Field(..., ge=0, le=100, description="Overall score for this category")
+    breakdown: dict = Field(default_factory=dict, description="Detailed score breakdown")
+
+
 class ContractScores(BaseModel):
     """Compliance scores for a contract"""
     overall: int = Field(..., ge=0, le=100, description="Overall compliance score")
-    riba_free: int = Field(..., ge=0, le=100, description="Freedom from interest/usury")
-    gharar_free: int = Field(..., ge=0, le=100, description="Clarity and certainty")
-    halal_industry: int = Field(..., ge=0, le=100, description="Permissible business activity")
-    fair_terms: int = Field(..., ge=0, le=100, description="Fairness and balance")
-    transparency: int = Field(..., ge=0, le=100, description="Disclosure and honesty")
+    # Legacy Islamic scores (for backward compatibility)
+    riba_free: Optional[int] = Field(None, ge=0, le=100, description="Freedom from interest/usury")
+    gharar_free: Optional[int] = Field(None, ge=0, le=100, description="Clarity and certainty")
+    halal_industry: Optional[int] = Field(None, ge=0, le=100, description="Permissible business activity")
+    fair_terms: Optional[int] = Field(None, ge=0, le=100, description="Fairness and balance")
+    transparency: Optional[int] = Field(None, ge=0, le=100, description="Disclosure and honesty")
+    # New category-based scores
+    categories: List[CategoryScores] = Field(default_factory=list, description="Scores per check category")
 
 
 class ContractAnalysis(BaseModel):

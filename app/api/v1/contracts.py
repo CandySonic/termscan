@@ -12,6 +12,7 @@ from app.models.contract import (
     ScoreOnlyResponse,
     ContractFlag,
     ErrorResponse,
+    CheckCategory,
 )
 from app.services.analyzer import analyzer
 
@@ -53,6 +54,7 @@ async def analyze_contract(
         analysis = await analyzer.analyze(
             contract_text=request.text,
             contract_type=request.type,
+            checks=request.checks,
         )
         
         # Store for later retrieval

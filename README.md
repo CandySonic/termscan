@@ -1,14 +1,24 @@
-# Halal Contract API
+# TermScan - AI Contract Compliance API
 
-An AI-powered API that analyzes contracts against Islamic finance principles and ethical guidelines.
+An AI-powered API that analyzes contracts against multiple compliance frameworks with a checkbox-based UI.
 
-## 🕌 What It Does
+## 🔍 What It Does
 
-1. **Analyze contracts** for Islamic compliance
-2. **Score permissibility** (0-100 scale)
-3. **Flag violations** (Riba, Gharar, Haram industries, etc.)
-4. **Suggest improvements** with scholarly references
-5. **Generate reports** (JSON or PDF)
+1. **Analyze contracts** for multiple compliance types (user selects via checkboxes)
+2. **Score compliance** (0-100 scale per category)
+3. **Flag violations** with explanations and suggestions
+4. **Provide recommendations** with references
+5. **Parallel processing** - analyze multiple categories simultaneously
+
+## ✅ Check Categories
+
+| Category | Icon | What It Checks |
+|----------|------|----------------|
+| **Islamic Compliance** | 🕌 | Riba (interest), Gharar (uncertainty), Haram industries |
+| **Artist Rights** | 🎵 | Royalties, ownership, creative control, termination rights |
+| **Privacy & Data** | 🔒 | GDPR, data collection, sharing, consent, retention |
+| **Legal Red Flags** | ⚖️ | Non-competes, liability, indemnification, jurisdiction |
+| **Fair Terms** | ⚡ | Hidden fees, auto-renewal, one-sided clauses |
 
 ## 🚀 Quick Start
 
@@ -45,6 +55,16 @@ All API requests require an API key in the header:
 Authorization: Bearer your_api_key_here
 ```
 
+## 📊 Request Example
+
+```json
+{
+  "text": "This Employment Agreement is entered into between...",
+  "type": "employment",
+  "checks": ["islamic", "artist_rights", "fair_terms"]
+}
+```
+
 ## 📊 Response Example
 
 ```json
@@ -52,24 +72,39 @@ Authorization: Bearer your_api_key_here
   "id": "contract_abc123",
   "status": "completed",
   "scores": {
-    "overall": 85,
-    "riba_free": 100,
-    "gharar_free": 70,
-    "halal_industry": 100,
-    "fair_terms": 85,
-    "transparency": 80
+    "overall": 78,
+    "categories": [
+      {
+        "category": "islamic",
+        "overall": 85,
+        "breakdown": {
+          "riba_free": 100,
+          "gharar_free": 70,
+          "halal_industry": 100
+        }
+      },
+      {
+        "category": "artist_rights",
+        "overall": 65,
+        "breakdown": {
+          "ownership_retained": 50,
+          "royalty_fairness": 70,
+          "termination_rights": 75
+        }
+      }
+    ]
   },
   "flags": [
     {
       "severity": "warning",
-      "category": "gharar",
-      "clause": "Payment terms subject to market conditions",
-      "explanation": "Ambiguous payment terms may constitute gharar (excessive uncertainty)",
-      "suggestion": "Specify exact payment amounts and dates",
-      "reference": "Sahih Muslim 1513"
+      "category": "ownership",
+      "clause": "All works created shall be work-for-hire...",
+      "explanation": "Artist loses ownership of their creative work",
+      "suggestion": "Negotiate for co-ownership or licensing instead",
+      "reference": "Industry standard: artists retain master ownership"
     }
   ],
-  "summary": "This contract is largely compliant with Islamic principles..."
+  "summary": "**Islamic:** Compliant with minor issues.\n\n**Artist Rights:** Concerns with ownership terms."
 }
 ```
 
